@@ -25,7 +25,11 @@ async function getAccessToken() {
     );
     return res.data.access_token;
   } catch (error) {
-    throw new Error(`Failed to get access token: ${error.response?.data?.message || error.message}`);
+    throw new Error(
+      `Failed to get access token: ${
+        error.response?.data?.message || error.message
+      }`
+    );
   }
 }
 
@@ -38,7 +42,9 @@ async function getUserId(accessToken, email) {
     if (!user) throw new Error(`User ${email} not found`);
     return user.id;
   } catch (error) {
-    throw new Error(`Failed to get user ID: ${error.response?.data?.message || error.message}`);
+    throw new Error(
+      `Failed to get user ID: ${error.response?.data?.message || error.message}`
+    );
   }
 }
 
@@ -47,18 +53,19 @@ async function createMeeting(accessToken) {
     const res = await axios.post(
       `https://api.zoom.us/v2/users/me/meetings`,
       {
-        topic: "Automated Bot Meeting",
-        type: 2,
-        start_time: new Date(Date.now() + 5 * 60 * 1000).toISOString(),
-        duration: 60,
+        topic: "Automated Bot Meeting (Test)",
+        type: 1,
+        // start_time: new Date(Date.now() + 5 * 60 * 1000).toISOString(),
+        // duration: 60,
         settings: {
           join_before_host: true,
           waiting_room: false,
-          host_video: false,
-          participant_video: false,
-          mute_upon_entry: true,
-          auto_recording: "none",
+          // host_video: false,
+          // participant_video: false,
+          // mute_upon_entry: true,
+          // auto_recording: "cloud",
           meeting_authentication: false,
+          // alternative_hosts: "jchill@example.com",
         },
       },
       {
@@ -70,7 +77,11 @@ async function createMeeting(accessToken) {
     );
     return res.data;
   } catch (error) {
-    throw new Error(`Failed to create meeting: ${JSON.stringify(error.response?.data, null, 2) || error.message}`);
+    throw new Error(
+      `Failed to create meeting: ${
+        JSON.stringify(error.response?.data, null, 2) || error.message
+      }`
+    );
   }
 }
 

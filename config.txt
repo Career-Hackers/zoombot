@@ -1,0 +1,10 @@
+
+    meeting_number: "94869022440"
+    token: "eyJ0eXAiOiJKV1QiLCJzdiI6IjAwMDAwMiIsInptX3NrbSI6InptX28ybSIsImFsZyI6IkhTMjU2In0.eyJpc3MiOiJ3ZWIiLCJjbHQiOjAsIm1udW0iOiI5NDg2OTAyMjQ0MCIsImF1ZCI6ImNsaWVudHNtIiwidWlkIjoiSTRlXzVuQVNTcmlBckwtdnRNRFd0USIsInppZCI6IjM0NTNkNmFkNmVlNzQyNzdhYzg4YzdmNzdhODhiZGQ3Iiwic2siOiIwIiwic3R5IjoxLCJ3Y2QiOiJhdzEiLCJleHAiOjE3NDcwNTA5NjIsImlhdCI6MTc0NzA0Mzc2MiwiYWlkIjoialBpeVNVdWlRWW1SdFVrUkZ0TkhUUSIsImNpZCI6IiJ9.-guY7l2EsXoc1bEBQH747D8Mn48VrQ95lbJeo3N9-co"
+    meeting_password: "D41Pwz"
+    recording_token: ""
+    GetVideoRawData: "true"
+    GetAudioRawData: "false"
+    SendVideoRawData: "false"
+    SendAudioRawData: "false"
+    

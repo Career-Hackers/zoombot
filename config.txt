@@ -1,8 +1,8 @@
 
-    meeting_number: "95766722889"
-    token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBLZXkiOiJsTlR0elNMdVE1VFNmTXJlYlM0TkEiLCJpYXQiOjE3NDcyMTMwNjUsImV4cCI6MTc0NzIxNjY2NSwidG9rZW5FeHAiOjE3NDcyMTY2NjV9.ZY3qaCgj2N7Bq7bwFNogHox40zIywdkjyOfRw5AkOc4"
-    meeting_password: "93TiCE"
-    recording_token: "lrho8exdu"
+    meeting_number: "96167656566"
+    token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBLZXkiOiJsTlR0elNMdVE1VFNmTXJlYlM0TkEiLCJpYXQiOjE3NDcyMTY4NTgsImV4cCI6MTc0NzIyMDQ1OCwidG9rZW5FeHAiOjE3NDcyMjA0NTh9.dO4NtSmdFsYCFLuSTDWzZ7tTA45Iexb-9PiZzUhNNSc"
+    meeting_password: "g9yh8Q"
+    recording_token: ""
     GetVideoRawData: "true"
     GetAudioRawData: "false"
     SendVideoRawData: "false"

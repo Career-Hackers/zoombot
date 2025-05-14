@@ -17,7 +17,7 @@ dotenv.config();
 const app = express();
 const PORT = 3000;
 
-const BOT_SCRIPT_PATH = path.resolve("/bot/main/meetingSDKDemo");
+const BOT_SCRIPT_PATH = path.resolve(__dirname, "../bot/main/meetingSDKDemo");
 
 // CloudWatch setup
 const REGION = "ap-east-1";

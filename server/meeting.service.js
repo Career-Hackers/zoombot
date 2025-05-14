@@ -1,6 +1,6 @@
-const axios = require("axios");
-const fs = require("fs");
-const jwt = require("jsonwebtoken");
+import axios from "axios";
+import fs from "fs";
+import jwt from "jsonwebtoken";
 
 // 🔧 Replace with your actual values
 const CLIENT_ID = "J_VVwdkdRTyOam9VlTcA_A";
@@ -134,7 +134,7 @@ async function writeConfigFile(accessToken, { id, password }) {
   return config;
 }
 
-const createMeeting = async () => {
+const startMeeting = async () => {
   try {
     const token = await getAccessToken();
     console.log("🔐 Got access token");
@@ -152,4 +152,4 @@ const createMeeting = async () => {
   }
 };
 
-export { createMeeting };
+export { startMeeting };

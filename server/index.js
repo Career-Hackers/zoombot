@@ -1,7 +1,7 @@
 import express from "express";
 import { exec } from "child_process";
 import path from "path";
-import { createMeeting } from "./meeting.service.js";
+import { startMeeting } from "./meeting.service.js";
 
 const app = express();
 const PORT = 3000;
@@ -13,12 +13,12 @@ app.post("/create-meeting", async (req, res) => {
   try {
     console.log("🛠️ Creating meeting...");
 
-    const config = await createMeeting();
+    const config = await startMeeting();
 
-    console.log("📅 Meeting created successfully");
+    console.log("📅 Meeting started successfully");
 
     res.status(200).json({
-      message: "Meeting created successfully",
+      message: "Meeting started successfully",
       meetingConfig: config,
     });
   } catch (error) {

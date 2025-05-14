@@ -15,7 +15,7 @@ const PORT = 3000;
 const BOT_SCRIPT_PATH = path.resolve("/home/ubuntu/bot/main/meetingSDKDemo");
 
 // CloudWatch setup
-const REGION = "ap-southeast-1"; // Update to your region
+const REGION = "ap-east-1"; // Update to your region
 const LOG_GROUP_NAME = "/zoom-bot";
 const cloudwatchClient = new CloudWatchLogsClient({ region: REGION });
 

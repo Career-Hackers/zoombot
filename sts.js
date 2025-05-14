@@ -48,15 +48,16 @@ async function getUserId(accessToken, email) {
   }
 }
 
-async function createMeeting(accessToken) {
+async function createMeeting(accessToken, botUserId) {
   try {
     const res = await axios.post(
       `https://api.zoom.us/v2/users/me/meetings`,
+      // `https://api.zoom.us/v2/users/${botUserId}/meetings`,
       {
         topic: "Automated Bot Meeting (Test)",
-        type: 1,
-        // start_time: new Date(Date.now() + 5 * 60 * 1000).toISOString(),
-        // duration: 60,
+        type: 2,
+        start_time: new Date(Date.now() + 5 * 60 * 1000).toISOString(),
+        duration: 60,
         settings: {
           join_before_host: true,
           waiting_room: false,
@@ -95,18 +96,41 @@ function generateJWT() {
   return jwt.sign(payload, SDK_SECRET);
 }
 
-function writeConfigFile({ id, password }) {
+async function getRecordingToken(meetingId, secret_token) {
+  const res = await axios.get(
+    `https://api.zoom.us/v2/meetings/${meetingId}/jointoken/local_recording`,
+    {
+      headers: {
+        Authorization: `Bearer ${secret_token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  if (res.status !== 200) {
+    throw new Error(
+      `Failed to get recording token: ${JSON.stringify(res.data, null, 2)} - ${
+        res.status
+      }`
+    );
+  }
+  const recordingToken = res.data.token;
+  console.log("Recording token:", recordingToken);
+  return recordingToken;
+}
+
+async function writeConfigFile(accessToken, { id, password }) {
   const jwt = generateJWT();
+  const recordingToken = await getRecordingToken(id, accessToken);
   const config = `
-meeting_number: "${id}"
-token: "${jwt}"
-meeting_password: "${password || ""}"
-recording_token: ""
-GetVideoRawData: "true"
-GetAudioRawData: "false"
-SendVideoRawData: "false"
-SendAudioRawData: "false"
-`;
+    meeting_number: "${id}"
+    token: "${jwt}"
+    meeting_password: "${password || ""}"
+    recording_token: "${recordingToken}"
+    GetVideoRawData: "true"
+    GetAudioRawData: "false"
+    SendVideoRawData: "false"
+    SendAudioRawData: "false"
+  `;
   fs.writeFileSync("config.txt", config);
   console.log("✅ config.txt generated.");
 }
@@ -119,10 +143,10 @@ async function main() {
     const botUserId = await getUserId(token, BOT_USER_EMAIL);
     console.log("👤 Bot user ID:", botUserId);
 
-    const meeting = await createMeeting(token);
+    const meeting = await createMeeting(token, botUserId);
     console.log("📅 Meeting created:", meeting.id);
 
-    writeConfigFile(meeting);
+    writeConfigFile(token, meeting);
   } catch (error) {
     console.error("❌ Error:", error.message);
   }

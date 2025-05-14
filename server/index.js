@@ -21,7 +21,7 @@ const PORT = 3000;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const BOT_SCRIPT_PATH = path.resolve(__dirname, "../bot/main/meetingSDKDemo");
+const BOT_SCRIPT_PATH = path.resolve(__dirname, "../bot/main/bin/meetingSDKDemo");
 
 // CloudWatch setup
 const REGION = "ap-east-1";

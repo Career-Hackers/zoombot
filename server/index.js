@@ -26,6 +26,11 @@ app.post("/start-bot", (req, res) => {
   res.status(200).json({ message: "Bot started (check logs for output)" });
 });
 
+app.post("/health", (req, res) => {
+  console.log("🩺 Health check received");
+  res.status(200).json({ status: "OK" });
+});
+
 app.listen(PORT, () => {
   console.log(`🚀 Server listening on port ${PORT}`);
 });

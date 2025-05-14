@@ -5,9 +5,11 @@ import { startMeeting } from "./meeting.service.js";
 import dotenv from "dotenv";
 import {
   CloudWatchLogsClient,
+  CreateLogGroupCommand,
   CreateLogStreamCommand,
   PutLogEventsCommand,
   DescribeLogStreamsCommand,
+  DescribeLogGroupsCommand,
 } from "@aws-sdk/client-cloudwatch-logs";
 
 dotenv.config();
@@ -18,7 +20,7 @@ const PORT = 3000;
 const BOT_SCRIPT_PATH = path.resolve("/home/ubuntu/bot/main/meetingSDKDemo");
 
 // CloudWatch setup
-const REGION = "ap-east-1"; // Update to your region
+const REGION = "ap-east-1";
 const LOG_GROUP_NAME = "/zoom-bot";
 const cloudwatchClient = new CloudWatchLogsClient({
   region: REGION,
@@ -31,6 +33,26 @@ const cloudwatchClient = new CloudWatchLogsClient({
 async function ensureLogStream(meetingId) {
   const logStreamName = `meeting-${meetingId}`;
 
+  // Ensure log group exists
+  try {
+    const existingGroups = await cloudwatchClient.send(
+      new DescribeLogGroupsCommand({ logGroupNamePrefix: LOG_GROUP_NAME })
+    );
+    const found = existingGroups.logGroups?.find(
+      (group) => group.logGroupName === LOG_GROUP_NAME
+    );
+    if (!found) {
+      await cloudwatchClient.send(
+        new CreateLogGroupCommand({ logGroupName: LOG_GROUP_NAME })
+      );
+      console.log(`🆕 Created log group: ${LOG_GROUP_NAME}`);
+    }
+  } catch (err) {
+    console.error("❌ Failed to check/create log group:", err.message);
+    throw err;
+  }
+
+  // Ensure log stream exists
   const { logStreams } = await cloudwatchClient.send(
     new DescribeLogStreamsCommand({
       logGroupName: LOG_GROUP_NAME,
@@ -45,6 +67,7 @@ async function ensureLogStream(meetingId) {
         logStreamName,
       })
     );
+    console.log(`🆕 Created log stream: ${logStreamName}`);
   }
 
   return logStreamName;
@@ -71,7 +94,9 @@ async function sendToCloudWatch(logStreamName, messages) {
     })),
   };
 
-  if (sequenceToken) params.sequenceToken = sequenceToken;
+  if (sequenceToken) {
+    params.sequenceToken = sequenceToken;
+  }
 
   await cloudwatchClient.send(new PutLogEventsCommand(params));
 }
@@ -99,7 +124,6 @@ app.post("/start-bot", async (req, res) => {
   }
 
   const logStreamName = await ensureLogStream(meetingId);
-
   console.log(`🔁 Triggering bot for meeting ${meetingId}...`);
 
   const process = exec(BOT_SCRIPT_PATH, async (error, stdout, stderr) => {

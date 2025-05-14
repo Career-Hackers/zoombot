@@ -21,7 +21,10 @@ const PORT = 3000;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const BOT_SCRIPT_PATH = path.resolve(__dirname, "../bot/main/bin/meetingSDKDemo");
+const BOT_SCRIPT_PATH = path.resolve(
+  __dirname,
+  "../bot/main/bin/meetingSDKDemo"
+);
 
 // CloudWatch setup
 const REGION = "ap-east-1";
@@ -110,6 +113,80 @@ app.post("/create-meeting", async (req, res) => {
     console.log("🛠️ Creating meeting...");
     const config = await startMeeting();
     console.log("📅 Meeting started successfully");
+
+    console.log(config);
+
+    const {
+      meetingId,
+      token,
+      password,
+      recordingToken,
+      GetVideoRawData = "true",
+      GetAudioRawData = "false",
+      SendVideoRawData = "false",
+      SendAudioRawData = "false",
+    } = config;
+
+    const logStreamName = await ensureLogStream(meetingId);
+
+    console.log(`Triggering bot for meeting ${meetingId}...`);
+
+    const cmd = `${BOT_SCRIPT_PATH} meeting_number=${meetingId} token=${token} meeting_password=${password} recording_token=${recordingToken} GetVideoRawData=${GetVideoRawData} GetAudioRawData=${GetAudioRawData} SendVideoRawData=${SendVideoRawData} SendAudioRawData=${SendAudioRawData}`;
+    console.log("🔁 Executing command:", cmd);
+
+    const logs = [];
+
+    const process = exec(cmd, async (error, stdout, stderr) => {
+      if (error) {
+        const msg = `❌ Error executing command: ${error.message}`;
+        console.error(msg);
+        logs.push(msg);
+      }
+      if (stderr) {
+        const msg = `⚠️ Stderr: ${stderr}`;
+        console.error(msg);
+        logs.push(msg);
+      }
+      if (stdout) {
+        const msg = `✅ Stdout: ${stdout}`;
+        console.log(msg);
+        logs.push(msg);
+      }
+      try {
+        await sendToCloudWatch(logStreamName, logs);
+      } catch (err) {
+        console.error("❌ Failed to send logs to CloudWatch:", err.message);
+      }
+    });
+
+    process.stdout.on("data", (data) => {
+      const msg = `🔁 Bot output: ${data}`;
+      console.log(msg);
+      logs.push(msg);
+    });
+
+    process.stderr.on("data", (data) => {
+      const msg = `❌ Bot error: ${data}`;
+      console.error(msg);
+      logs.push(msg);
+    });
+
+    process.on("close", async (code) => {
+      const msg = `🔁 Bot process exited with code ${code}`;
+      console.log(msg);
+      logs.push(msg);
+      try {
+        await sendToCloudWatch(logStreamName, logs);
+      } catch (err) {
+        console.error(
+          "❌ Failed to send final logs to CloudWatch:",
+          err.message
+        );
+      }
+    });
+
+    console.log("🔁 Bot process started");
+
     res.status(200).json({
       message: "Meeting started successfully",
       meetingConfig: config,

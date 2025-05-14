@@ -2,12 +2,15 @@ import express from "express";
 import { exec } from "child_process";
 import path from "path";
 import { startMeeting } from "./meeting.service.js";
+import dotenv from "dotenv";
 import {
   CloudWatchLogsClient,
   CreateLogStreamCommand,
   PutLogEventsCommand,
   DescribeLogStreamsCommand,
 } from "@aws-sdk/client-cloudwatch-logs";
+
+dotenv.config();
 
 const app = express();
 const PORT = 3000;

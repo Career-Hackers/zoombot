@@ -117,21 +117,21 @@ app.post("/create-meeting", async (req, res) => {
     console.log(config);
 
     const {
-      meetingId,
+      meeting_number,
       token,
-      password,
-      recordingToken,
+      meeting_password,
+      recording_token,
       GetVideoRawData = "true",
       GetAudioRawData = "false",
       SendVideoRawData = "false",
       SendAudioRawData = "false",
     } = config;
 
-    const logStreamName = await ensureLogStream(meetingId);
+    const logStreamName = await ensureLogStream(meeting_number);
 
-    console.log(`Triggering bot for meeting ${meetingId}...`);
+    console.log(`Triggering bot for meeting ${meeting_number}...`);
 
-    const cmd = `${BOT_SCRIPT_PATH} meeting_number=${meetingId} token=${token} meeting_password=${password} recording_token=${recordingToken} GetVideoRawData=${GetVideoRawData} GetAudioRawData=${GetAudioRawData} SendVideoRawData=${SendVideoRawData} SendAudioRawData=${SendAudioRawData}`;
+    const cmd = `${BOT_SCRIPT_PATH} meeting_number=${meeting_number} token=${token} meeting_password=${meeting_password} recording_token=${recording_token} GetVideoRawData=${GetVideoRawData} GetAudioRawData=${GetAudioRawData} SendVideoRawData=${SendVideoRawData} SendAudioRawData=${SendAudioRawData}`;
     console.log("🔁 Executing command:", cmd);
 
     const logs = [];

@@ -1,6 +1,7 @@
 import express from "express";
 import { exec } from "child_process";
 import path from "path";
+import { fileURLToPath } from "url";
 import { startMeeting } from "./meeting.service.js";
 import dotenv from "dotenv";
 import {
@@ -16,6 +17,9 @@ dotenv.config();
 
 const app = express();
 const PORT = 3000;
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const BOT_SCRIPT_PATH = path.resolve(__dirname, "../bot/main/meetingSDKDemo");
 

@@ -15,6 +15,11 @@ import {
 
 dotenv.config();
 
+// At top of your index.js
+exec("pkill -f meetingSDKDemo", () => {
+  console.log("✅ Cleaned up old meetingSDKDemo processes");
+});
+
 const app = express();
 const PORT = 3000;
 

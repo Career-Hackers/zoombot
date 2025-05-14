@@ -17,7 +17,13 @@ const BOT_SCRIPT_PATH = path.resolve("/home/ubuntu/bot/main/meetingSDKDemo");
 // CloudWatch setup
 const REGION = "ap-east-1"; // Update to your region
 const LOG_GROUP_NAME = "/zoom-bot";
-const cloudwatchClient = new CloudWatchLogsClient({ region: REGION });
+const cloudwatchClient = new CloudWatchLogsClient({
+  region: REGION,
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  },
+});
 
 async function ensureLogStream(meetingId) {
   const logStreamName = `meeting-${meetingId}`;

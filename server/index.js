@@ -1,12 +1,31 @@
-const express = require("express");
-const { exec } = require("child_process");
-const path = require("path");
+import express from "express";
+import { exec } from "child_process";
+import path from "path";
+import { createMeeting } from "./meeting.service.js";
 
 const app = express();
 const PORT = 3000;
 
 // Adjust this to the full or relative path to your bot binary/script
 const BOT_SCRIPT_PATH = path.resolve("/home/ubuntu/bot/demo/meetingSDKDemo");
+
+app.post("/create-meeting", async (req, res) => {
+  try {
+    console.log("🛠️ Creating meeting...");
+
+    const config = await createMeeting();
+
+    console.log("📅 Meeting created successfully");
+
+    res.status(200).json({
+      message: "Meeting created successfully",
+      meetingConfig: config,
+    });
+  } catch (error) {
+    console.error("❌ Error creating meeting:", error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
 
 app.post("/start-bot", (req, res) => {
   console.log("🔁 Triggering bot...");

@@ -147,13 +147,16 @@ export const runBot = async (config) => {
 
   const flushLogs = async () => {
     if (logBuffer.length > 0) {
-      console.log(`📦 Sending ${logBuffer.length} logs to CloudWatch...`);
+      // console.log(`📦 Sending ${logBuffer.length} logs to CloudWatch...`);
       try {
         await sendToCloudWatch(logStreamName, logBuffer);
+        logBuffer = [];
       } catch (err) {
-        console.error("Failed to send batch to CloudWatch:", err.message);
+        console.error(
+          `[${logStreamName}] Failed to send batch to CloudWatch:`,
+          err.message
+        );
       }
-      logBuffer = [];
     }
   };
 

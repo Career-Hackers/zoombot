@@ -1,6 +1,6 @@
-import axios from "axios";
-import fs from "fs";
-import jwt from "jsonwebtoken";
+const axios = require("axios");
+const fs = require("fs");
+const jwt = require("jsonwebtoken");
 
 // 🔧 Replace with your actual values
 const CLIENT_ID = "J_VVwdkdRTyOam9VlTcA_A";
@@ -120,21 +120,22 @@ async function getRecordingToken(meetingId, secret_token) {
 
 async function writeConfigFile(accessToken, { id, password }) {
   const jwt = generateJWT();
-  const recordingToken = await getRecordingToken(id, accessToken);
-  const config = {
-    meeting_number: `${id}`,
-    token: `${jwt}`,
-    meeting_password: `${password || ""}`,
-    recording_token: `${recordingToken}`,
-    GetVideoRawData: "true",
-    GetAudioRawData: "false",
-    SendVideoRawData: "false",
-    SendAudioRawData: "false",
-  };
-  return config;
+  // const recordingToken = await getRecordingToken(id, accessToken);
+  const config = `
+    meeting_number: "${id}"
+    token: "${jwt}"
+    meeting_password: "${password || ""}"
+    recording_token: ""
+    GetVideoRawData: "true"
+    GetAudioRawData: "false"
+    SendVideoRawData: "false"
+    SendAudioRawData: "false"
+  `;
+  fs.writeFileSync("config.txt", config);
+  console.log("✅ config.txt generated.");
 }
 
-const startMeeting = async () => {
+async function main() {
   try {
     const token = await getAccessToken();
     console.log("🔐 Got access token");
@@ -142,31 +143,21 @@ const startMeeting = async () => {
     const botUserId = await getUserId(token, BOT_USER_EMAIL);
     console.log("👤 Bot user ID:", botUserId);
 
-    const meeting = await createMeeting(token, botUserId);
-    console.log("📅 Meeting created:", meeting.id);
+    // const meeting = await createMeeting(token, botUserId);
+    // console.log("📅 Meeting created:", meeting.id);
+    const meetingUrl =
+      "https://zoom.us/j/97213772518?pwd=avxc4RK5u3KIucwdtQa5zi01sPwtT9.1";
+    const meetingId = meetingUrl.split("/j/")[1].split("?")[0];
+    const meetingPassword = meetingUrl.split("pwd=")[1].split(".")[0];
+    const meeting = {
+      id: meetingId,
+      password: meetingPassword,
+    };
 
-    const config = writeConfigFile(token, meeting);
-    return config;
+    writeConfigFile(token, meeting);
   } catch (error) {
     console.error("❌ Error:", error.message);
   }
-};
+}
 
-const startInterview = async (meeting) => {
-  try {
-    const token = await getAccessToken();
-    console.log("🔐 Got access token");
-
-    const botUserId = await getUserId(token, BOT_USER_EMAIL);
-    console.log("👤 Bot user ID:", botUserId);
-
-    console.log("📅 Meeting to join:", meeting.id);
-
-    const config = writeConfigFile(token, meeting);
-    return config;
-  } catch (error) {
-    console.error("❌ Error:", error.message);
-  }
-};
-
-export { startMeeting };
+main();

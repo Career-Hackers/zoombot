@@ -152,7 +152,7 @@ const startMeeting = async () => {
   }
 };
 
-const startInterview = async (meeting) => {
+export const startInterview = async (meeting) => {
   try {
     const token = await getAccessToken();
     console.log("🔐 Got access token");

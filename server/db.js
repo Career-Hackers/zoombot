@@ -7,10 +7,7 @@ let client = null;
 let db = null;
 
 export async function setupMongoClient() {
-  client = new MongoClient(uri, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
+  client = new MongoClient(uri);
   await client.connect();
   db = client.db("test");
 }

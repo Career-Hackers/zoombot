@@ -1,7 +1,7 @@
 import express from "express";
 import { exec } from "child_process";
 import { startMeeting, startInterview } from "./meeting.service.js";
-import { runBot } from "./process.service.js";
+import { runBot, recoverRunningBots } from "./process.service.js";
 import { setupMongoClient, closeDB } from "./db.js";
 
 // ===================================================

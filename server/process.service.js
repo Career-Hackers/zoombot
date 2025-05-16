@@ -223,6 +223,11 @@ export const recoverRunningBots = async () => {
     .find({ status: "running" })
     .toArray();
 
+  if (bots.length === 0) {
+    console.log("✅ No running bots found");
+    return;
+  }
+
   for (const bot of bots) {
     try {
       process.kill(bot.pid, 0); // Check if process exists

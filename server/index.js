@@ -3,9 +3,6 @@ import { exec } from "child_process";
 
 import { startMeeting, startInterview } from "./meeting.service.js";
 import { runBot } from "./process.service.js";
-import dotenv from "dotenv";
-
-dotenv.config();
 
 // !! remove this later, since if many bots running, restart will kill all
 exec("pkill -f meetingSDKDemo", () => {

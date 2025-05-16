@@ -8,7 +8,8 @@ const main = async () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          meetingUrl: "https://zoom.us/j/97953558544?pwd=ePPXH4w4VzwdfCLhZ2XpjcU8uCKoO2.1",
+          meetingUrl:
+            "https://zoom.us/j/95420633029?pwd=fxideoK4tXuDfZ6d3TswXV6OhU1Lxe.1",
         }),
       }
     );

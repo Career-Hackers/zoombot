@@ -75,7 +75,7 @@ async function setupLogStream(meetingId) {
     console.log(`🆕 Created log stream: ${logStreamName}`);
   }
 
-  return logStreamName;
+  return { uuid, logStreamName };
 }
 
 // ====================================================
@@ -122,7 +122,7 @@ export const runBot = async (config) => {
 
   console.log(`Triggering bot for meeting ${meeting_number}...`);
 
-  const logStreamName = await setupLogStream(meeting_number);
+  const { uuid, logStreamName } = await setupLogStream(meeting_number);
   const args = [
     `meeting_number=${meeting_number}`,
     `token=${token}`,

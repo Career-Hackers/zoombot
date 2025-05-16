@@ -212,7 +212,7 @@ export const runBot = async (config) => {
   console.log("🔁 Bot process started");
 };
 
-const recoverRunningBots = async () => {
+export const recoverRunningBots = async () => {
   if (!db) {
     console.error("❌ MongoDB connection not established");
     throw new Error("MongoDB connection not established");
@@ -242,5 +242,3 @@ const recoverRunningBots = async () => {
     }
   }
 };
-
-await recoverRunningBots();

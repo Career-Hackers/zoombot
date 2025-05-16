@@ -25,8 +25,6 @@ const BOT_SCRIPT_PATH = path.resolve(
 // CloudWatch setup
 const REGION = "ap-east-1";
 const LOG_GROUP_NAME = "/zoom-bot";
-console.log(process.env.AWS_ACCESS_KEY_ID);
-console.log(process.env.AWS_SECRET_ACCESS_KEY);
 const cloudwatchClient = new CloudWatchLogsClient({
   region: REGION,
   credentials: {

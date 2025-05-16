@@ -1,5 +1,4 @@
 import express from "express";
-const { MongoClient, ObjectId } = require("mongodb");
 import { exec } from "child_process";
 import { startMeeting, startInterview } from "./meeting.service.js";
 import { runBot } from "./process.service.js";
@@ -151,7 +150,7 @@ app.listen(PORT, async () => {
   }
   try {
     console.log("🔗 Connecting to MongoDB...");
-    setupMongoClient();
+    await setupMongoClient();
     console.log("✅ Connected to MongoDB");
   } catch (error) {
     console.error("❌ Failed to connect to MongoDB:", error.message);

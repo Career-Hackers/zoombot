@@ -3,27 +3,21 @@ import { MongoClient } from "mongodb";
 const uri = process.env.MONGODB_URI;
 const client = null;
 
-let db = null;
-
-export function setupMongoClient() {
+export async function setupMongoClient() {
   client = new MongoClient(uri, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   });
+  await client.connect();
 }
 
 export async function connectToDB() {
-  if (!db) {
-    await client.connect();
-    db = client.db("test");
+  if (!client) {
+    console.error("❌ MongoDB client is not set up");
+    throw new Error("MongoDB client is not set up");
   }
-  return db;
-}
+  let db = client.db("test");
 
-export function getDB() {
-  if (!db) {
-    throw new Error("DB not initialized. Call connectToDB first.");
-  }
   return db;
 }
 

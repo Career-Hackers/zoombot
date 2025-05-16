@@ -10,7 +10,7 @@ import {
 } from "@aws-sdk/client-cloudwatch-logs";
 import { spawn } from "child_process";
 import { v4 as uuidv4 } from "uuid";
-import { connectToDB } from "./db.js";
+import { db } from "./db.js";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -156,7 +156,10 @@ export const runBot = async (config) => {
     }
   };
 
-  const db = await connectToDB();
+  if (!db) {
+    console.error("❌ MongoDB connection not established");
+    throw new Error("MongoDB connection not established");
+  }
 
   // ==========================================
   const handleData = (prefix, data) => {
@@ -210,7 +213,11 @@ export const runBot = async (config) => {
 };
 
 const recoverRunningBots = async () => {
-  const db = await connectToDB();
+  if (!db) {
+    console.error("❌ MongoDB connection not established");
+    throw new Error("MongoDB connection not established");
+  }
+
   const bots = await db
     .collection("bot_processes")
     .find({ status: "running" })

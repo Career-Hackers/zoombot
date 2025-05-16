@@ -1,7 +1,8 @@
 import { MongoClient } from "mongodb";
 
 const uri = process.env.MONGODB_URI;
-const client = null;
+let client = null;
+let db = null;
 
 export async function setupMongoClient() {
   client = new MongoClient(uri, {
@@ -9,16 +10,7 @@ export async function setupMongoClient() {
     useUnifiedTopology: true,
   });
   await client.connect();
-}
-
-export async function connectToDB() {
-  if (!client) {
-    console.error("❌ MongoDB client is not set up");
-    throw new Error("MongoDB client is not set up");
-  }
-  let db = client.db("test");
-
-  return db;
+  db = client.db("test");
 }
 
 export async function closeDB() {
@@ -26,4 +18,4 @@ export async function closeDB() {
   console.log("❌ MongoDB connection closed.");
 }
 
-export { client };
+export { client, db };

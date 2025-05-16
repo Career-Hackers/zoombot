@@ -9,7 +9,7 @@ const main = async () => {
         },
         body: JSON.stringify({
           meetingUrl:
-            "https://zoom.us/j/91324241917?pwd=a4vEaqMHMP8eYOf8k8wkkhaaKnC8ZJ.1",
+            "https://zoom.us/j/93068960285?pwd=NCHvk1BOoT8LEv97LJzHpTxUDREasm.1",
         }),
       }
     );

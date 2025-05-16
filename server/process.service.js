@@ -142,7 +142,7 @@ export const runBot = async (config) => {
     stdio: ["ignore", "pipe", "pipe"],
   });
 
-  const logs = [];
+  // const logs = [];
   let logBuffer = [];
 
   const flushLogs = async () => {
@@ -169,10 +169,16 @@ export const runBot = async (config) => {
 
   // ==========================================
   const handleData = (prefix, data) => {
-    const msg = `${prefix} ${data.toString().trim()}`;
-    console.log(msg);
-    logs.push(msg);
-    logBuffer.push(msg);
+    let buffer = data.toString();
+    let lines = buffer.split("\n");
+
+    for (const line of lines) {
+      if (line.trim() === "") continue; // Skip empty lines
+      const msg = `${prefix} ${line}`;
+      console.log(msg);
+      // logs.push(msg);
+      logBuffer.push(msg);
+    }
   };
   botProcess.stdout.on("data", (data) =>
     handleData(`📤 [${meeting_number}]`, data)
@@ -187,7 +193,7 @@ export const runBot = async (config) => {
     console.log(msg);
 
     clearInterval(interval);
-    logs.push(msg);
+    // logs.push(msg);
     await flushLogs();
 
     await db.collection("bot_processes").updateOne(

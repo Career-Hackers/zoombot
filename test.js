@@ -8,7 +8,7 @@ const main = async () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          meetingUrl: "https://careerhackers.zoom.us/j/1234567890?pwd=abcdefg",
+          meetingUrl: "https://zoom.us/j/97953558544?pwd=ePPXH4w4VzwdfCLhZ2XpjcU8uCKoO2.1",
         }),
       }
     );

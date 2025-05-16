@@ -1,8 +1,35 @@
 import express from "express";
+const { MongoClient, ObjectId } = require("mongodb");
 import { exec } from "child_process";
-
 import { startMeeting, startInterview } from "./meeting.service.js";
 import { runBot } from "./process.service.js";
+import { setupMongoClient, closeDB } from "./db.js";
+
+// ===================================================
+process.on("SIGINT", async () => {
+  console.log("🛑 SIGINT received. Cleaning up...");
+  await closeDB();
+  process.exit(0);
+});
+
+process.on("SIGTERM", async () => {
+  console.log("🛑 SIGTERM received. Cleaning up...");
+  await closeDB();
+  process.exit(0);
+});
+
+process.on("uncaughtException", async (err) => {
+  console.error("💥 Uncaught exception:", err);
+  await closeDB();
+  process.exit(1);
+});
+
+process.on("unhandledRejection", async (reason) => {
+  console.error("💥 Unhandled rejection:", reason);
+  await closeDB();
+  process.exit(1);
+});
+// ===================================================
 
 // !! remove this later, since if many bots running, restart will kill all
 exec("pkill -f meetingSDKDemo", () => {
@@ -116,6 +143,27 @@ app.get("/health", (req, res) => {
   res.status(200).json({ status: "OK" });
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
+  console.log("🚀 Starting server...");
+  if (!uri) {
+    console.error("❌ MongoDB URI is not set");
+    process.exit(1);
+  }
+  try {
+    console.log("🔗 Connecting to MongoDB...");
+    setupMongoClient();
+    console.log("✅ Connected to MongoDB");
+  } catch (error) {
+    console.error("❌ Failed to connect to MongoDB:", error.message);
+    process.exit(1);
+  }
+
+  try {
+    console.log("Recovering bot processes...");
+    await recoverRunningBots();
+  } catch (error) {
+    console.error("❌ Failed to recover bot processes:", error.message);
+  }
+
   console.log(`🚀 Server listening on port ${PORT}`);
 });

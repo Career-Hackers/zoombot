@@ -8,9 +8,10 @@ import {
   DescribeLogStreamsCommand,
   DescribeLogGroupsCommand,
 } from "@aws-sdk/client-cloudwatch-logs";
+import { exec } from "child_process";
 import { v4 as uuidv4 } from "uuid";
+import { connectToDB } from "./db.js";
 import dotenv from "dotenv";
-
 dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
@@ -124,47 +125,117 @@ export const runBot = async (config) => {
   console.log(`Triggering bot for meeting ${meeting_number}...`);
 
   const logStreamName = await setupLogStream(meeting_number);
+  const args = [
+    `meeting_number=${meeting_number}`,
+    `token=${token}`,
+    `meeting_password=${meeting_password}`,
+    `recording_token=${recording_token}`,
+    `GetVideoRawData=${GetVideoRawData}`,
+    `GetAudioRawData=${GetAudioRawData}`,
+    `SendVideoRawData=${SendVideoRawData}`,
+    `SendAudioRawData=${SendAudioRawData}`,
+  ];
 
-  const cmd = `${BOT_SCRIPT_PATH} meeting_number=${meeting_number} token=${token} meeting_password=${meeting_password} recording_token=${recording_token} GetVideoRawData=${GetVideoRawData} GetAudioRawData=${GetAudioRawData} SendVideoRawData=${SendVideoRawData} SendAudioRawData=${SendAudioRawData}`;
-  console.log("🔁 Executing command:", cmd);
+  console.log(`🚀 Spawning Zoom bot for meeting ${meeting_number}...`);
+
+  const botProcess = spawn(BOT_SCRIPT_PATH, args, {
+    cwd: path.dirname(BOT_SCRIPT_PATH),
+    detached: true,
+    stdio: ["ignore", "pipe", "pipe"],
+  });
 
   const logs = [];
+  let logBuffer = [];
 
-  const process = exec(cmd, async (error, stdout, stderr) => {
-    if (error) {
-      const msg = `❌ Error executing command: ${error.message}`;
-      console.error(msg);
-      logs.push(msg);
+  const flushLogs = async () => {
+    if (logBuffer.length > 0) {
+      try {
+        await sendToCloudWatch(logStreamName, logBuffer);
+      } catch (err) {
+        console.error("Failed to send batch to CloudWatch:", err.message);
+      }
+      logBuffer = [];
     }
-    try {
-      await sendToCloudWatch(logStreamName, logs);
-    } catch (err) {
-      console.error("❌ Failed to send logs to CloudWatch:", err.message);
-    }
-  });
+  };
 
-  process.stdout.on("data", (data) => {
-    const msg = `🔁 Bot output: ${data}`;
+  const db = await connectToDB();
+
+  // ==========================================
+  const handleData = (prefix, data) => {
+    const msg = `${prefix} ${data.toString().trim()}`;
     console.log(msg);
     logs.push(msg);
-  });
+    logBuffer.push(msg);
+  };
+  botProcess.stdout.on("data", (data) =>
+    handleData(`📤 [${meeting_number}]`, data)
+  );
+  botProcess.stderr.on("data", (data) =>
+    handleData(`❗ [${meeting_number}]`, data)
+  );
 
-  process.stderr.on("data", (data) => {
-    const msg = `❌ Bot error: ${data}`;
-    console.error(msg);
-    logs.push(msg);
-  });
-
-  process.on("close", async (code) => {
-    const msg = `🔁 Bot process exited with code ${code}`;
+  // =========================================
+  botProcess.on("close", async (code) => {
+    const msg = `🛑 Bot for meeting ${meeting_number} exited with code ${code}`;
     console.log(msg);
+
+    clearInterval(interval);
     logs.push(msg);
-    try {
-      await sendToCloudWatch(logStreamName, logs);
-    } catch (err) {
-      console.error("❌ Failed to send final logs to CloudWatch:", err.message);
-    }
+    await flushLogs();
+
+    await db.collection("bot_processes").updateOne(
+      { pid: botProcess.pid },
+      {
+        $set: {
+          status: code === 0 ? "completed" : "failed",
+          endTime: new Date(),
+        },
+      }
+    );
+  });
+
+  botProcess.unref(); // Allows parent to exit without waiting for child
+
+  // Save process info to MongoDB
+  await db.collection("bot_processes").insertOne({
+    meetingId: meeting_number,
+    uuid,
+    logStreamName,
+    pid: botProcess.pid,
+    startTime: new Date(),
+    endTime: null,
+    status: "running",
+    lastUpdate: new Date(),
   });
 
   console.log("🔁 Bot process started");
 };
+
+const recoverRunningBots = async () => {
+  const db = await connectToDB();
+  const bots = await db
+    .collection("bot_processes")
+    .find({ status: "running" })
+    .toArray();
+
+  for (const bot of bots) {
+    try {
+      process.kill(bot.pid, 0); // Check if process exists
+      console.log(
+        `✅ Bot still running for meeting ${bot.meetingId}, PID: ${bot.pid}`
+      );
+    } catch (err) {
+      console.log(
+        `⚠️ Bot for meeting ${bot.meetingId} (PID: ${bot.pid}) no longer alive, marking as failed`
+      );
+      await db
+        .collection("bot_processes")
+        .updateOne(
+          { pid: bot.pid },
+          { $set: { status: "failed", endTime: new Date() } }
+        );
+    }
+  }
+};
+
+await recoverRunningBots();

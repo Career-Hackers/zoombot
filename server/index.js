@@ -16,18 +16,6 @@ process.on("SIGTERM", async () => {
   await closeDB();
   process.exit(0);
 });
-
-process.on("uncaughtException", async (err) => {
-  console.error("💥 Uncaught exception:", err);
-  await closeDB();
-  process.exit(1);
-});
-
-process.on("unhandledRejection", async (reason) => {
-  console.error("💥 Unhandled rejection:", reason);
-  await closeDB();
-  process.exit(1);
-});
 // ===================================================
 
 // !! remove this later, since if many bots running, restart will kill all

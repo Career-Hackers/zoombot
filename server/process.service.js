@@ -161,6 +161,8 @@ export const runBot = async (config) => {
     throw new Error("MongoDB connection not established");
   }
 
+  const interval = setInterval(flushLogs, 5 * 1000);
+
   // ==========================================
   const handleData = (prefix, data) => {
     const msg = `${prefix} ${data.toString().trim()}`;

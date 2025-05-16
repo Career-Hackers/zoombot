@@ -152,7 +152,23 @@ const startMeeting = async () => {
   }
 };
 
-export const startInterview = async (meeting) => {
+// ==================================
+const getConfig = async ({ id, password }) => {
+  const jwt = generateJWT();
+  const config = {
+    meeting_number: `${id}`,
+    token: `${jwt}`,
+    meeting_password: `${password || ""}`,
+    recording_token: "",
+    GetVideoRawData: "true",
+    GetAudioRawData: "false",
+    SendVideoRawData: "false",
+    SendAudioRawData: "false",
+  };
+  return config;
+};
+
+const startInterview = async (meeting) => {
   try {
     const token = await getAccessToken();
     console.log("🔐 Got access token");
@@ -162,11 +178,12 @@ export const startInterview = async (meeting) => {
 
     console.log("📅 Meeting to join:", meeting.id);
 
-    const config = writeConfigFile(token, meeting);
+    const config = getConfig(meeting);
     return config;
   } catch (error) {
     console.error("❌ Error:", error.message);
+    throw error;
   }
 };
 
-export { startMeeting };
+export { startMeeting, startInterview };

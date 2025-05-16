@@ -15,6 +15,9 @@ exec("pkill -f meetingSDKDemo", () => {
 const app = express();
 const PORT = 3000;
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 app.post("/create-meeting", async (req, res) => {
   try {
     console.log("🛠️ Creating meeting...");

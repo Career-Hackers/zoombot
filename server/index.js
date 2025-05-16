@@ -7,7 +7,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-// At top of your index.js
+// !! remove this later, since if many bots running, restart will kill all
 exec("pkill -f meetingSDKDemo", () => {
   console.log("✅ Cleaned up old meetingSDKDemo processes");
 });
@@ -107,6 +107,11 @@ app.post("/start-bot", async (req, res) => {
 });
 
 app.post("/health", (req, res) => {
+  console.log("🩺 Health check received");
+  res.status(200).json({ status: "OK" });
+});
+
+app.get("/health", (req, res) => {
   console.log("🩺 Health check received");
   res.status(200).json({ status: "OK" });
 });

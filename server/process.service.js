@@ -8,7 +8,7 @@ import {
   DescribeLogStreamsCommand,
   DescribeLogGroupsCommand,
 } from "@aws-sdk/client-cloudwatch-logs";
-import { exec } from "child_process";
+import { spawn } from "child_process";
 import { v4 as uuidv4 } from "uuid";
 import { connectToDB } from "./db.js";
 import dotenv from "dotenv";

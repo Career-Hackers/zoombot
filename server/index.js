@@ -132,10 +132,6 @@ app.get("/health", (req, res) => {
 
 app.listen(PORT, async () => {
   console.log("🚀 Starting server...");
-  if (!uri) {
-    console.error("❌ MongoDB URI is not set");
-    process.exit(1);
-  }
   try {
     console.log("🔗 Connecting to MongoDB...");
     await setupMongoClient();

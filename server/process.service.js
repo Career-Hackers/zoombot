@@ -147,6 +147,7 @@ export const runBot = async (config) => {
 
   const flushLogs = async () => {
     if (logBuffer.length > 0) {
+      console.log(`📦 Sending ${logBuffer.length} logs to CloudWatch...`);
       try {
         await sendToCloudWatch(logStreamName, logBuffer);
       } catch (err) {

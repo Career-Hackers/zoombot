@@ -141,13 +141,13 @@ app.listen(PORT, async () => {
     process.exit(1);
   }
 
-  try {
-    console.log("Recovering bot processes...");
-    await recoverRunningBots();
-  } catch (error) {
-    console.error("❌ Failed to recover bot processes:", error.message);
-    process.exit(1);
-  }
+  // try {
+  //   console.log("Recovering bot processes...");
+  //   await recoverRunningBots();
+  // } catch (error) {
+  //   console.error("❌ Failed to recover bot processes:", error.message);
+  //   process.exit(1);
+  // }
 
   console.log(`🚀 Server listening on port ${PORT}`);
 });
